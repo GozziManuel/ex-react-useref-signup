@@ -1,17 +1,19 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./css/App.css";
 
 function App() {
+  const InputRefYear = useRef();
+  const InputRefName = useRef();
+
   const [inputs, setInputs] = useState({
-    name: "",
     username: "",
     password: "",
-    year: 0,
     description: "",
     select: "",
   });
 
+  const [counter, setCounter] = useState(1000);
   //
   // Keyboard
   const letters = "abcdefghijklmnopqrstuvwxyz";
@@ -34,8 +36,24 @@ function App() {
   const [isPasswordLength, setIsPasswordLength] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
 
+  // Description Check
+  const [isDescriptionLength, setIsDescriptionLength] = useState(false);
+
+  useEffect(() => {
+    InputRefName.current.focus();
+  }, []);
+  //
+  //
+
   const handleInputs = (e) => {
     const { name, value } = e.target;
+    console.log("alfa");
+
+    if (name === "description") {
+      const trimValue = value.trim();
+      const descLength = trimValue.length;
+      setCounter(1000 - descLength);
+    }
 
     setInputs({
       ...inputs,
@@ -43,12 +61,54 @@ function App() {
     });
   };
 
+  const HandleReset = () => {
+    InputRefName.current.value = "";
+    InputRefYear.current.value = 0;
+    setInputs({
+      username: "",
+      password: "",
+      description: "",
+      select: "",
+    });
+    setIsErrorSelect(false);
+    setIsUsername(false);
+    setIsUsernameLength(false);
+    setIsPassword(false);
+    setIsPasswordLength(false);
+    setIsError(false);
+    setIsDescriptionLength(false);
+  };
+
   //
   //
   const handleForm = (e) => {
     e.preventDefault();
+    const NameRef = InputRefName.current.value;
+    const YearRef = InputRefYear.current.value;
+    // // RESET
+    setIsErrorSelect(false);
+    setIsUsername(false);
+    setIsUsernameLength(false);
+    setIsPassword(false);
+    setIsPasswordLength(false);
+    setIsError(false);
+    setIsDescriptionLength(false);
 
-    const password = inputs.password;
+    // // INPUT EMPTY
+    if (
+      NameRef === "" ||
+      inputs.description === "" ||
+      inputs.username === "" ||
+      inputs.password === ""
+    ) {
+      setIsError(true);
+
+      return;
+    } else {
+      setIsError(false);
+    }
+
+    // // USERNAME CHAR
     const username = inputs.username;
     const falseandtrue = [];
 
@@ -59,60 +119,24 @@ function App() {
 
       falseandtrue.push(contain);
       falseandtrue.push(containNumber);
-      if (falseandtrue.find((el) => el === true)) {
-        setIsUsername(true);
-        return;
-      }
+    }
+    if (falseandtrue.find((el) => el === true)) {
+      setIsUsername(true);
+      return;
+    } else {
+      setIsUsername(false);
     }
 
     //
-    //
+    //Password CHAR
 
+    const password = inputs.password;
     const passwordNumber = [];
     const passwordSymbol = [];
     const passwordLetter = [];
 
-    for (let index = 0; index < password.length; index++) {
-      const element = password[index];
-      const containNumber = numbers.includes(element);
-      const containSymbol = symbols.includes(element);
-      const containLetter = letters.includes(element);
-
-      passwordSymbol.push(containSymbol);
-      passwordNumber.push(containNumber);
-      passwordLetter.push(containLetter);
-
-      if (
-        passwordNumber.find((el) => el === true) &&
-        passwordSymbol.find((el) => el === true) &&
-        passwordLetter.find((el) => el === true)
-      ) {
-        setIsPassword(false);
-      } else {
-        setIsPassword(true);
-      }
-    }
     //
     //
-
-    if (
-      inputs.name === "" ||
-      inputs.description === "" ||
-      inputs.username === "" ||
-      inputs.password === ""
-    ) {
-      setIsError(true);
-      setIsErrorSelect(false);
-      setIsUsername(false);
-      setIsUsernameLength(false);
-      setIsPassword(false);
-      setIsPasswordLength(false);
-      return;
-    } else {
-      setIsError(false);
-    }
-
-    // Password validation and username validation for length
     if (inputs.password.length < 8 && inputs.username.length < 6) {
       setIsPasswordLength(true);
       setIsUsernameLength(true);
@@ -122,6 +146,7 @@ function App() {
       setIsPasswordLength(false);
       setIsUsernameLength(false);
     }
+    // Password validation and username validation for length
     if (inputs.username.length < 6) {
       setIsUsernameLength(true);
       return;
@@ -136,11 +161,45 @@ function App() {
       setIsPasswordLength(false);
     }
 
-    //
-    //
-    // if () {
-    // }
-    console.log(inputs);
+    for (let index = 0; index < password.length; index++) {
+      const element = password[index];
+      const containNumber = numbers.includes(element);
+      const containSymbol = symbols.includes(element);
+      const containLetter = letters.includes(element);
+
+      passwordSymbol.push(containSymbol);
+      passwordNumber.push(containNumber);
+      passwordLetter.push(containLetter);
+    }
+    if (
+      passwordNumber.find((el) => el === true) &&
+      passwordSymbol.find((el) => el === true) &&
+      passwordLetter.find((el) => el === true)
+    ) {
+      setIsPassword(false);
+    } else {
+      setIsPassword(true);
+      return;
+    }
+
+    if (inputs.select === "") {
+      setIsErrorSelect(true);
+      return;
+    } else {
+      setIsErrorSelect(false);
+    }
+    if (inputs.description.length < 100) {
+      setIsDescriptionLength(true);
+      return;
+    } else {
+      setIsDescriptionLength(false);
+    }
+
+    console.log({
+      ...inputs,
+      realName: NameRef,
+      year: YearRef,
+    });
   };
   return (
     <>
@@ -152,8 +211,7 @@ function App() {
           <input
             type="text"
             name="name"
-            value={inputs.name}
-            onChange={handleInputs}
+            ref={InputRefName}
             className="inputs"
           />
         </div>
@@ -251,8 +309,8 @@ function App() {
           <input
             type="number"
             name="year"
-            value={inputs.year}
-            onChange={handleInputs}
+            ref={InputRefYear}
+            defaultValue={0}
             className="inputs"
             min={0}
           />
@@ -269,10 +327,20 @@ function App() {
             value={inputs.description}
             onChange={handleInputs}
             className="textareaForm"
+            maxLength={1000}
           ></textarea>
+          <p>{counter}</p>
+          {isDescriptionLength && (
+            <div className="ErrorInput">
+              <div>
+                <p>Almeno 100 char</p>
+              </div>
+            </div>
+          )}
         </div>
         <button>Registrati!</button>
       </form>
+      <button onClick={() => HandleReset()}>Resetta </button>
 
       {/* ERROR FOR SELECT */}
       {isErrorSelect && (
