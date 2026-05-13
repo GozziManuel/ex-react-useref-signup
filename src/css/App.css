@@ -36,3 +36,17 @@ select {
 .inputContainer {
   width: 100%;
 }
+.GoUp {
+  background-color: gray;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  cursor: pointer;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
+.scrollbar {
+  height: 1220px;
+}

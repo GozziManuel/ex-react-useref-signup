@@ -5,6 +5,7 @@ import "./css/App.css";
 function App() {
   const InputRefYear = useRef();
   const InputRefName = useRef();
+  const ScrollUpRef = useRef();
 
   const [inputs, setInputs] = useState({
     username: "",
@@ -42,6 +43,10 @@ function App() {
   useEffect(() => {
     InputRefName.current.focus();
   }, []);
+
+  const scrollUp = () => {
+    ScrollUpRef.current.scrollIntoView({ behavior: "smooth" });
+  };
   //
   //
 
@@ -203,6 +208,7 @@ function App() {
   };
   return (
     <>
+      <div ref={ScrollUpRef}></div>
       <form action="" className="formSign" onSubmit={handleForm}>
         {/* REAL NAME */}
 
@@ -341,6 +347,10 @@ function App() {
         <button>Registrati!</button>
       </form>
       <button onClick={() => HandleReset()}>Resetta </button>
+      <button className="GoUp" onClick={scrollUp}>
+        Sali
+      </button>
+      <div className="scrollbar"></div>
 
       {/* ERROR FOR SELECT */}
       {isErrorSelect && (
